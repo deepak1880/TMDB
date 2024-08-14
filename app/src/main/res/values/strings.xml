@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">TMDB</string>
+    <string name="onboard_normal_title">"Everything about "</string>
+    <string name="onboard_bold_title">movies, series, anime and much more.</string>
+    <string name="onboard_subtitle">Inside you will find information on films, series, anime and much more.</string>
+    <string name="explore">Explore</string>
+    <string name="home_top_title">What do you want to watch today?</string>
+    <string name="placeholder_search">Search...</string>
+    <string name="description_placeholder">Após cumprir pena por um crime violento, Ruth volta ao convívio na sociedade, que se recusa a perdoar seu passado. Discriminada no lugar que já chamou de lar, sua única esperança é encontrar a irmã, que ela havia sido forçada a deixar para trás.</string>
+    <string name="watch_trailer">Watch trailer</string>
+    <string name="category_s">Category(s)</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="trending">Trending</string>
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <!--    listOf("Movies", "Series", "Animes", "Novels")-->
+    <string-array name="types">
+        <item>Movies</item>
+        <item>Series</item>
+        <item>Animes</item>
+        <item>Novels</item>
+    </string-array>
+</resources>
