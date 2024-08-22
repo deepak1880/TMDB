@@ -1,0 +1,161 @@
+package com.shaikhabdulgani.tmdb.home.presentation
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.shaikhabdulgani.tmdb.core.presentation.util.PaginatedListState
+import com.shaikhabdulgani.tmdb.core.presentation.util.Paginator
+import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
+import com.shaikhabdulgani.tmdb.home.presentation.util.HomeTab
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val homeRepository: HomeRepository
+) : ViewModel() {
+
+    companion object {
+        private const val TAG = "HomeViewModel"
+    }
+
+    var trendingMovies by
+    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+
+    var upcomingMovies by
+    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+
+    var onTheAirSeries by
+    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+
+    var popularSeries by
+    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+
+    var currentActiveTab by mutableStateOf(HomeTab.MOVIES)
+
+    private val trendingMoviePaginator = Paginator(
+        initialPage = 1,
+        onLoading = { trendingMovies = trendingMovies.copy(isLoading = it) },
+        onRequest = {
+            viewModelScope.async(Dispatchers.IO) {
+                homeRepository.getTrendingMovies(it)
+            }.await()
+        },
+        getNextPage = { _, _ -> trendingMovies.page + 1 },
+        onError = {
+//            trendingMovies = trendingMovies.copy(
+//                endReached = true
+//            )
+        },
+        onSuccess = { items, newPage ->
+            trendingMovies = trendingMovies.copy(
+                list = trendingMovies.list + items,
+                page = newPage,
+                endReached = items.isEmpty()
+            )
+        },
+        onClear = {}
+    )
+
+    private val upcomingMoviePaginator = Paginator(
+        initialPage = 1,
+        onLoading = { upcomingMovies = upcomingMovies.copy(isLoading = it) },
+        onRequest = {
+            viewModelScope.async(Dispatchers.IO) {
+                homeRepository.getUpcomingMovies(it)
+            }.await()
+        },
+        getNextPage = { _, _ -> upcomingMovies.page + 1 },
+        onError = { },
+        onSuccess = { items, newPage ->
+            upcomingMovies = upcomingMovies.copy(
+                list = upcomingMovies.list + items,
+                page = newPage,
+                endReached = items.isEmpty()
+            )
+        },
+        onClear = {}
+    )
+
+    private val onTheAirSeriesPaginator = Paginator(
+        initialPage = 1,
+        onLoading = { onTheAirSeries = onTheAirSeries.copy(isLoading = it) },
+        onRequest = {
+            viewModelScope.async(Dispatchers.IO) {
+                homeRepository.getOnTheAirSeries(it)
+            }.await()
+        },
+        getNextPage = { _, _ -> onTheAirSeries.page + 1 },
+        onError = { },
+        onSuccess = { items, newPage ->
+            onTheAirSeries = onTheAirSeries.copy(
+                list = onTheAirSeries.list + items,
+                page = newPage,
+                endReached = items.isEmpty()
+            )
+        },
+        onClear = {}
+    )
+
+    private val popularSeriesPaginator = Paginator(
+        initialPage = 1,
+        onLoading = { popularSeries = popularSeries.copy(isLoading = it) },
+        onRequest = {
+            viewModelScope.async(Dispatchers.IO) {
+                homeRepository.getPopularSeries(it)
+            }.await()
+        },
+        getNextPage = { _, _ -> popularSeries.page + 1 },
+        onError = { },
+        onSuccess = { items, newPage ->
+            popularSeries = popularSeries.copy(
+                list = popularSeries.list + items,
+                page = newPage,
+                endReached = items.isEmpty()
+            )
+        },
+        onClear = {}
+    )
+
+    fun onEvent(event: HomeEvent) {
+        when (event) {
+            is HomeEvent.TabClicked -> onTabClicked(event.selectedTab)
+        }
+    }
+
+    private fun onTabClicked(selectedTab: HomeTab) {
+        currentActiveTab = selectedTab
+    }
+
+    fun loadTrendingMovies() = viewModelScope.launch(Dispatchers.IO) {
+        if (!trendingMovies.endReached && !trendingMovies.isLoading) {
+            trendingMoviePaginator.loadNext()
+        }
+    }
+
+    fun loadUpcomingMovies() = viewModelScope.launch(Dispatchers.IO) {
+        if (!upcomingMovies.endReached && !upcomingMovies.isLoading) {
+            upcomingMoviePaginator.loadNext()
+        }
+    }
+
+    fun loadPopularSeries() = viewModelScope.launch {
+        if (!popularSeries.endReached && !popularSeries.isLoading) {
+            popularSeriesPaginator.loadNext()
+        }
+    }
+
+    fun loadOnTheAirSeries() = viewModelScope.launch {
+        if (!onTheAirSeries.endReached && !onTheAirSeries.isLoading) {
+            onTheAirSeriesPaginator.loadNext()
+        }
+    }
+}
+
+

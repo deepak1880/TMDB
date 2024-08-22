@@ -14,11 +14,33 @@
     <string name="trending">Trending</string>
     <string name="back">Back</string>
     <string name="save">Save</string>
-    <!--    listOf("Movies", "Series", "Animes", "Novels")-->
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="do_not_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="forget_password">Forget password?</string>
+    <string name="login">Login</string>
+    <string name="login_welcome_message">Welcome back to TMDB. Have a good time</string>
+    <string name="signup_welcome_message">Welcome to TMDB. Have a good time</string>
+    <string name="email">Email</string>
+    <string name="email_placeholder">youremail@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="password_placeholder">m#P52s@ap$V</string>
+    <string name="on_the_air">On The Air</string>
+    <string name="search_no_data_message">The keyword you type doesn\'t match anything in our database</string>
+    <string name="search_something_message">Type some keywords to get the result.</string>
+    <string name="runtime_args">%s mins</string>
+
+    <string-array name="filters">
+        <item>All</item>
+        <item>Movie</item>
+        <item>Series</item>
+        <item>Person</item>
+    </string-array>
     <string-array name="types">
         <item>Movies</item>
         <item>Series</item>
-        <item>Animes</item>
-        <item>Novels</item>
+<!--        <item>Animes</item>-->
+<!--        <item>Novels</item>-->
     </string-array>
 </resources>
