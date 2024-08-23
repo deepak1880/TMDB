@@ -1,5 +1,6 @@
 package com.shaikhabdulgani.tmdb.global
 
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,5 +21,5 @@ sealed interface Screen {
     data object Search : Screen
 
     @Serializable
-    class MovieDetail(val id: Int) : Screen
+    class MovieDetail(val id: Int, val mediaType: String = MediaType.MOVIE.getValue()) : Screen
 }

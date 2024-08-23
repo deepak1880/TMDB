@@ -63,6 +63,7 @@ import com.shaikhabdulgani.tmdb.moviedetail.domain.model.Genre
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.component.TopSummary
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.util.parseReleaserYear
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.util.toSingleDecimalPlaces
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 import com.shaikhabdulgani.tmdb.ui.theme.ErrorColor
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
 import com.shaikhabdulgani.tmdb.ui.theme.spacing
@@ -70,12 +71,13 @@ import com.shaikhabdulgani.tmdb.ui.theme.spacing
 @Composable
 fun MovieDetailScreen(
     id: Int,
+    mediaType: String = MediaType.MOVIE.getValue(),
     controller: NavHostController,
     viewModel: MovieDetailViewModel
 ) {
     val context = LocalContext.current
     LaunchedEffect(context) {
-        viewModel.getMovieDetails(id)
+        viewModel.getMovieDetails(id,MediaType.parse(mediaType))
     }
     val movieDetail = viewModel.movieDetail
     Column(
@@ -95,7 +97,7 @@ fun MovieDetailScreen(
             runtime = stringResource(id = R.string.runtime_args, movieDetail.runtime),
             genre = if (movieDetail.genres.isNotEmpty()) movieDetail.genres[0].name else "",
             rating = movieDetail.rating.toSingleDecimalPlaces(),
-            onBackClick = { controller.popBackStack() },
+            onBackClick = { controller.navigateUp() },
             onSaveClick = { println(id) }
         )
 

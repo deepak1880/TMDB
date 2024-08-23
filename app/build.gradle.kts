@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -32,6 +34,15 @@ android {
                 "proguard-rules.pro"
             )
         }
+        defaultConfig {
+            val properties = Properties()
+            properties.load(project.rootProject.file("secret.properties").inputStream())
+            buildConfigField(
+                "String",
+                "API_KEY",
+                "\"${properties.getProperty("API_KEY")}\""
+            )
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -42,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -110,11 +122,11 @@ dependencies {
 //    implementation(libs.androidx.room.compliler)
 //    implementation(libs.androidx.room.ktx)
     val room_version = "2.6.1"
-    implementation ("androidx.room:room-runtime:$room_version")
-    implementation ("androidx.room:room-ktx:$room_version")
-    implementation ("androidx.compose.runtime:runtime-livedata:1.2.1")
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.compose.runtime:runtime-livedata:1.2.1")
 //    annotationProcessor ("androidx.room:room-compiler:$room_version")
-    kapt ("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
 
 }

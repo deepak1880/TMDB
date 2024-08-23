@@ -3,6 +3,7 @@ package com.shaikhabdulgani.tmdb.search.presentation
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
@@ -48,6 +50,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.shaikhabdulgani.tmdb.R
 import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.global.Constants
+import com.shaikhabdulgani.tmdb.global.Screen
 import com.shaikhabdulgani.tmdb.home.presentation.components.SearchBar
 import com.shaikhabdulgani.tmdb.home.presentation.components.TabLayout
 import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
@@ -64,6 +67,7 @@ import com.shaikhabdulgani.tmdb.ui.theme.spacing
 
 @Composable
 fun SearchScreen(
+    controller: NavController,
     viewModel: SearchViewModel
 ) {
     val query = viewModel.query.collectAsState()
@@ -115,11 +119,14 @@ fun SearchScreen(
                     viewModel.onEvent(SearchEvent.ReachedEnd)
                 }
                 SearchItem(
+                    id = item.id,
                     title = item.title,
                     imageId = item.imageId,
                     type = item.type,
                     parentContext = context
-                )
+                ){
+                    controller.navigate(Screen.MovieDetail(it,item.type.getValue()))
+                }
             }
         }
         if (query.value.query.isEmpty()){
@@ -187,17 +194,22 @@ private fun NoDatLayoutPrev() {
 @Composable
 fun SearchItem(
     modifier: Modifier = Modifier,
+    id: Int,
     title: String,
     imageId: String,
     type: MediaType,
-    parentContext: Context
+    parentContext: Context,
+    onClick: (Int)->Unit
 ) {
     Box(
         modifier = Modifier
             .then(modifier)
             .height(180.dp)
             .clip(RoundedCornerShape(MaterialTheme.spacing.defaultSmall))
-            .background(Color.Gray),
+            .background(Color.Gray)
+            .clickable {
+                onClick(id)
+            },
         contentAlignment = Alignment.Center
     ) {
         if (imageId.isBlank()) {
@@ -273,7 +285,8 @@ data class SearchData(
 @Preview
 @Composable
 private fun SearchScreenPrev() {
-    SearchScreen(viewModel = SearchViewModel(object : SearchRepository{
+    SearchScreen(NavController(LocalContext.current),viewModel = SearchViewModel(
+        object : SearchRepository{
         override suspend fun searchAll(query: String, page: Int): Result<List<SearchResult>> {
             return Result.failure()
         }

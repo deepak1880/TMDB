@@ -7,9 +7,10 @@ import retrofit2.http.Query
 
 interface MovieDetailApi {
 
-    @GET("movie/{id}")
+    @GET("{media_type}/{id}")
     suspend fun getMovieDetail(
         @Path("id") id: Int,
+        @Path("media_type") mediaType: String,
         @Query("append_to_response") append_to_response: String = "videos,credits,recommendations"
     ): MovieDetailDto
 

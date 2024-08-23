@@ -69,13 +69,14 @@ fun MainApp() {
 
         composable<Screen.Search> {
             val viewModel: SearchViewModel = hiltViewModel()
-            SearchScreen(viewModel)
+            SearchScreen(controller,viewModel)
         }
         composable<Screen.MovieDetail> {
             val args = it.toRoute<Screen.MovieDetail>()
             val viewModel = hiltViewModel<MovieDetailViewModel>()
             MovieDetailScreen(
                 id = args.id,
+                mediaType = args.mediaType,
                 controller = controller,
                 viewModel = viewModel
             )

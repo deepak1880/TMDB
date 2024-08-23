@@ -1,6 +1,7 @@
 package com.shaikhabdulgani.tmdb.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.shaikhabdulgani.tmdb.BuildConfig
 import com.shaikhabdulgani.tmdb.global.AuthInterceptor
 import com.shaikhabdulgani.tmdb.global.Constants
 import com.shaikhabdulgani.tmdb.home.data.remote.HomeApi
@@ -23,7 +24,7 @@ class NetworkModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(Constants.API_KEY))
+            .addInterceptor(AuthInterceptor(BuildConfig.API_KEY))
             .build()
     }
 

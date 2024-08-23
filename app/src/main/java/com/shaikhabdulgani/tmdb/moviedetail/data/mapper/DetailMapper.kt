@@ -8,13 +8,14 @@ import com.shaikhabdulgani.tmdb.moviedetail.data.source.local.entity.MovieDetail
 import com.shaikhabdulgani.tmdb.moviedetail.data.source.local.entity.RecommendationMovieEntity
 import com.shaikhabdulgani.tmdb.moviedetail.data.source.remote.dto.MovieDetailDto
 import com.shaikhabdulgani.tmdb.moviedetail.domain.model.MovieDetail
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 
 
-fun MovieDetailDto.toMovieDetailEntity(): MovieDetailEntity {
+fun MovieDetailDto.toMovieDetailEntity(type: String): MovieDetailEntity {
     return MovieDetailEntity(
         id = id,
         title = title,
-        type = "",
+        type = type,
         backdropPath = backdropPath,
         posterPath = posterPath,
         description = overview,
@@ -33,7 +34,7 @@ fun MovieDetailEntity.toMovieDetail(): MovieDetail {
         backdropPath = backdropPath,
         posterPath = posterPath,
         title = title,
-        type = "",
+        type = MediaType.parse(type),
         description = description,
         runtime = runtime.toString(),
         releaseYear = releaseDate,
