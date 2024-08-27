@@ -1,12 +1,7 @@
 package com.shaikhabdulgani.tmdb.home.presentation
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,12 +17,8 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +27,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.shaikhabdulgani.tmdb.R
 import com.shaikhabdulgani.tmdb.core.data.util.Result
@@ -50,9 +40,9 @@ import com.shaikhabdulgani.tmdb.core.presentation.util.noRippleClickable
 import com.shaikhabdulgani.tmdb.home.domain.model.Movie
 import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
 import com.shaikhabdulgani.tmdb.home.presentation.components.HomeTopTitle
-import com.shaikhabdulgani.tmdb.home.presentation.components.SearchBar
 import com.shaikhabdulgani.tmdb.home.presentation.components.TabLayout
 import com.shaikhabdulgani.tmdb.home.presentation.util.HomeTab
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 import com.shaikhabdulgani.tmdb.ui.theme.SearchBarBg
 import com.shaikhabdulgani.tmdb.ui.theme.Shapes
 import com.shaikhabdulgani.tmdb.ui.theme.White50
@@ -153,9 +143,16 @@ fun HomeScreen(
                 MovieRowWithTitle(
                     title = stringResource(R.string.trending),
                     movies = viewModel.trendingMovies.list,
-                    onClick = { controller.navigate(Screen.MovieDetail(it)) },
+                    onClick = {
+                        controller.navigate(
+                            Screen.MovieDetail(
+                                id = it.id,
+                                mediaType = MediaType.MOVIE.getValue()
+                            )
+                        )
+                    },
                     onLastReached = {
-                        Log.d("onLastReached","Last Reached")
+                        Log.d("onLastReached", "Last Reached")
                         viewModel.loadTrendingMovies()
                     }
                 )
@@ -163,7 +160,14 @@ fun HomeScreen(
                 MovieRowWithTitle(
                     title = stringResource(R.string.upcoming),
                     movies = viewModel.upcomingMovies.list,
-                    onClick = { controller.navigate(Screen.MovieDetail(it)) },
+                    onClick = {
+                        controller.navigate(
+                            Screen.MovieDetail(
+                                id = it.id,
+                                mediaType = MediaType.MOVIE.getValue()
+                            )
+                        )
+                    },
                     onLastReached = {
                         viewModel.loadUpcomingMovies()
                     }
@@ -174,7 +178,14 @@ fun HomeScreen(
                 MovieRowWithTitle(
                     title = stringResource(R.string.trending),
                     movies = viewModel.popularSeries.list,
-                    onClick = { controller.navigate(Screen.MovieDetail(it)) },
+                    onClick = {
+                        controller.navigate(
+                            Screen.MovieDetail(
+                                id = it.id,
+                                mediaType = MediaType.SERIES.getValue()
+                            )
+                        )
+                    },
                     onLastReached = {
                         viewModel.loadPopularSeries()
                     }
@@ -183,7 +194,17 @@ fun HomeScreen(
                 MovieRowWithTitle(
                     title = stringResource(R.string.on_the_air),
                     movies = viewModel.onTheAirSeries.list,
-                    onClick = { controller.navigate(Screen.MovieDetail(it)) }
+                    onClick = {
+                        controller.navigate(
+                            Screen.MovieDetail(
+                                id = it.id,
+                                mediaType = MediaType.SERIES.getValue()
+                            )
+                        )
+                    },
+                    onLastReached = {
+                        viewModel.loadOnTheAirSeries()
+                    }
                 )
             }
         }

@@ -1,7 +1,7 @@
 package com.shaikhabdulgani.tmdb.search.presentation.util
 
 enum class SearchFilter(private val value: String) {
-    ALL("all"),
+    ALL("All"),
     MOVIE("Movie"),
     SERIES("Series"),
     PERSON("Person")

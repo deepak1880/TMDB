@@ -1,8 +1,9 @@
 package com.shaikhabdulgani.tmdb.search.domain.model
 
-enum class MediaType(private val value: String) {
+enum class ContentType(private val value: String) {
     MOVIE("movie"),
     SERIES("tv"),
+    PERSON("person"),
     UNKNOWN("unknown")
     ;
 
@@ -11,15 +12,15 @@ enum class MediaType(private val value: String) {
     }
 
     companion object {
-        private val map = mutableMapOf<String, MediaType>()
+        private val map = mutableMapOf<String, ContentType>()
 
         init {
-            MediaType.entries.forEach {
+            ContentType.entries.forEach {
                 map[it.value] = it
             }
         }
 
-        fun parse(value: String?): MediaType {
+        fun parse(value: String?): ContentType {
             if (value == null) return UNKNOWN
             return map.getOrDefault(value, UNKNOWN)
         }

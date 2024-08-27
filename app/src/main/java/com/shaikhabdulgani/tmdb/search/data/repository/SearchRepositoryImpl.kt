@@ -5,40 +5,31 @@ import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.search.data.mapper.toMovieSearchResult
 import com.shaikhabdulgani.tmdb.search.data.mapper.toPersonSearchResult
 import com.shaikhabdulgani.tmdb.search.data.mapper.toSearchResult
-import com.shaikhabdulgani.tmdb.search.data.mapper.toSeriesSearchResult
 import com.shaikhabdulgani.tmdb.search.data.remote.SearchApi
 import com.shaikhabdulgani.tmdb.search.domain.model.SearchResult
+import com.shaikhabdulgani.tmdb.search.domain.model.SearchType
 import com.shaikhabdulgani.tmdb.search.domain.repository.SearchRepository
 import javax.inject.Inject
 
 class SearchRepositoryImpl @Inject constructor(
     private val api: SearchApi
-): SearchRepository, BaseRepository() {
-    override suspend fun searchAll(query: String, page: Int): Result<List<SearchResult>> {
+) : SearchRepository, BaseRepository() {
+    override suspend fun search(
+        query: String,
+        page: Int,
+        searchType: SearchType
+    ): Result<List<SearchResult>> {
         return execute {
-            val result = api.searchAll(query,page).results
-            result.map { it.toSearchResult() }
-        }
-    }
-
-    override suspend fun searchMovie(query: String, page: Int): Result<List<SearchResult>> {
-        return execute {
-            val result = api.searchMovie(query,page).results
-            result.map { it.toMovieSearchResult() }
-        }
-    }
-
-    override suspend fun searchTv(query: String, page: Int): Result<List<SearchResult>> {
-        return execute {
-            val result = api.searchTv(query,page).results
-            result.map { it.toSeriesSearchResult() }
-        }
-    }
-
-    override suspend fun searchPerson(query: String, page: Int): Result<List<SearchResult>> {
-        return execute {
-            val result = api.searchPerson(query,page).results
-            result.map { it.toPersonSearchResult() }
+            val result = api.search(
+                query = query,
+                page = page,
+                searchType = searchType.getValue()).results
+            when(searchType){
+                SearchType.MOVIE -> result.map { it.toMovieSearchResult() }
+                SearchType.SERIES -> result.map { it.toSearchResult() }
+                SearchType.PERSON -> result.map { it.toPersonSearchResult() }
+                SearchType.ALL -> result.map { it.toSearchResult() }
+            }
         }
     }
 }

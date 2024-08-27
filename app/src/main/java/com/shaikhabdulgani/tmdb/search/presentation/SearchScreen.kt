@@ -49,12 +49,14 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.shaikhabdulgani.tmdb.R
 import com.shaikhabdulgani.tmdb.core.data.util.Result
+import com.shaikhabdulgani.tmdb.core.presentation.util.toast
 import com.shaikhabdulgani.tmdb.global.Constants
 import com.shaikhabdulgani.tmdb.global.Screen
 import com.shaikhabdulgani.tmdb.home.presentation.components.SearchBar
 import com.shaikhabdulgani.tmdb.home.presentation.components.TabLayout
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 import com.shaikhabdulgani.tmdb.search.domain.model.SearchResult
+import com.shaikhabdulgani.tmdb.search.domain.model.SearchType
 import com.shaikhabdulgani.tmdb.search.domain.repository.SearchRepository
 import com.shaikhabdulgani.tmdb.search.presentation.util.SearchFilter
 import com.shaikhabdulgani.tmdb.ui.theme.Black
@@ -114,18 +116,25 @@ fun SearchScreen(
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
         ) {
-            itemsIndexed(items = result.value, key = { _, item -> item.id }) { i, item ->
-                if (i==result.value.size-1){
-                    viewModel.onEvent(SearchEvent.ReachedEnd)
+            itemsIndexed(items = result.value.list, key = { _, item -> item.id }) { i, item ->
+                if (i==result.value.list.size-1){
+                    viewModel.onEvent(SearchEvent.LoadMore)
                 }
                 SearchItem(
-                    id = item.id,
-                    title = item.title,
-                    imageId = item.imageId,
-                    type = item.type,
+                    searchResult = item,
                     parentContext = context
                 ){
-                    controller.navigate(Screen.MovieDetail(it,item.type.getValue()))
+                    when(it.type){
+                        ContentType.MOVIE,ContentType.SERIES -> {
+                            controller.navigate(Screen.MovieDetail(it.id,item.type.getValue()))
+                        }
+                        ContentType.PERSON -> {
+                            controller.navigate(Screen.MovieDetail(it.id,item.type.getValue()))
+                        }
+                        ContentType.UNKNOWN -> {
+                            context.toast(context.getString(R.string.unknown_media_navigation_error))
+                        }
+                    }
                 }
             }
         }
@@ -133,7 +142,7 @@ fun SearchScreen(
             SearchSomething(
                 message = stringResource(R.string.search_something_message)
             )
-        }else if(result.value.isEmpty()){
+        }else if(result.value.list.isEmpty()){
             NoDataLayout(message = stringResource(R.string.search_no_data_message))
         }
     }
@@ -194,12 +203,9 @@ private fun NoDatLayoutPrev() {
 @Composable
 fun SearchItem(
     modifier: Modifier = Modifier,
-    id: Int,
-    title: String,
-    imageId: String,
-    type: MediaType,
+    searchResult: SearchResult,
     parentContext: Context,
-    onClick: (Int)->Unit
+    onClick: (SearchResult)->Unit
 ) {
     Box(
         modifier = Modifier
@@ -208,17 +214,17 @@ fun SearchItem(
             .clip(RoundedCornerShape(MaterialTheme.spacing.defaultSmall))
             .background(Color.Gray)
             .clickable {
-                onClick(id)
+                onClick(searchResult)
             },
         contentAlignment = Alignment.Center
     ) {
-        if (imageId.isBlank()) {
+        if (searchResult.imageId.isBlank()) {
             Image(
                 modifier =
                 Modifier
                     .size(50.dp),
                 imageVector = Icons.Outlined.ImageNotSupported,
-                contentDescription = title,
+                contentDescription = searchResult.title,
                 contentScale = ContentScale.Crop,
             )
             Text(
@@ -235,7 +241,7 @@ fun SearchItem(
                     .padding(10.dp)
                     .align(Alignment.BottomCenter)
                 ,
-                text = title,
+                text = searchResult.title,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
                 color = Black
@@ -243,8 +249,8 @@ fun SearchItem(
         } else {
             SubcomposeAsyncImage(
                 modifier = Modifier.fillMaxSize(),
-                model = "${Constants.IMAGE_BASE_URL}${imageId}",
-                contentDescription = title,
+                model = "${Constants.IMAGE_BASE_URL}${searchResult.imageId}",
+                contentDescription = searchResult.title,
                 imageLoader = ImageLoader(parentContext),
                 contentScale = ContentScale.Crop,
             ) {
@@ -256,11 +262,11 @@ fun SearchItem(
             }
         }
 
-        val image = when(type){
-            MediaType.PERSON -> Icons.Outlined.PersonOutline
-            MediaType.MOVIE -> Icons.Outlined.Movie
-            MediaType.SERIES -> Icons.Outlined.Tv
-            MediaType.UNKNOWN -> Icons.Outlined.DeviceUnknown
+        val image = when(searchResult.type){
+            ContentType.PERSON -> Icons.Outlined.PersonOutline
+            ContentType.MOVIE -> Icons.Outlined.Movie
+            ContentType.SERIES -> Icons.Outlined.Tv
+            ContentType.UNKNOWN -> Icons.Outlined.DeviceUnknown
         }
 
         Image(
@@ -270,39 +276,25 @@ fun SearchItem(
                 .align(Alignment.TopEnd)
             ,
             imageVector = image,
-            contentDescription = type.getValue()
+            contentDescription = searchResult.type.getValue()
         )
     }
 }
-
-data class SearchData(
-    val id: Int,
-    val title: String = "Hero",
-    val imageId: String = "",
-    val type: String = "tv",
-)
 
 @Preview
 @Composable
 private fun SearchScreenPrev() {
     SearchScreen(NavController(LocalContext.current),viewModel = SearchViewModel(
         object : SearchRepository{
-        override suspend fun searchAll(query: String, page: Int): Result<List<SearchResult>> {
-            return Result.failure()
-        }
+            override suspend fun search(
+                query: String,
+                page: Int,
+                searchType: SearchType
+            ): Result<List<SearchResult>> {
+                return Result.failure()
+            }
 
-        override suspend fun searchMovie(query: String, page: Int): Result<List<SearchResult>> {
-            return Result.failure()
-        }
-
-        override suspend fun searchTv(query: String, page: Int): Result<List<SearchResult>> {
-            return Result.failure()
-        }
-
-        override suspend fun searchPerson(query: String, page: Int): Result<List<SearchResult>> {
-            return Result.failure()
-        }
-    }))
+        }))
 //    val context = LocalContext.current
 //    SearchItem(title = "Hello", imageId = "", type = MediaType.PERSON, parentContext = context)
 }

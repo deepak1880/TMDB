@@ -30,6 +30,7 @@
     <string name="search_no_data_message">The keyword you type doesn\'t match anything in our database</string>
     <string name="search_something_message">Type some keywords to get the result.</string>
     <string name="runtime_args">%s mins</string>
+    <string name="unknown_media_navigation_error">Cannot navigate to the detail page.</string>
 
     <string-array name="filters">
         <item>All</item>

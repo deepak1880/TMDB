@@ -1,14 +1,14 @@
 package com.shaikhabdulgani.tmdb.moviedetail.domain.model
 
 import com.shaikhabdulgani.tmdb.home.domain.model.Movie
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 
 data class MovieDetail(
     val id: Int,
     val backdropPath: String,
     val posterPath: String,
     val title: String,
-    val type: MediaType,
+    val type: ContentType,
     val description: String,
     val runtime: String,
     val releaseYear: String,

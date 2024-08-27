@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import com.shaikhabdulgani.tmdb.moviedetail.domain.repository.MovieDetailRepository
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.util.emptyMovieDetail
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,10 +24,10 @@ class MovieDetailViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
-    fun getMovieDetails(id: Int,mediaType: MediaType) {
+    fun getMovieDetails(id: Int, contentType: ContentType) {
         viewModelScope.launch {
             isLoading = true
-            repository.getMovieDetail(id,mediaType).collect {
+            repository.getMovieDetail(id,contentType).collect {
                 when (it) {
                     is Resource.Error -> {
                         isLoading = false

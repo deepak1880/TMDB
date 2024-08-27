@@ -76,7 +76,7 @@ fun MainApp() {
             val viewModel = hiltViewModel<MovieDetailViewModel>()
             MovieDetailScreen(
                 id = args.id,
-                mediaType = args.mediaType,
+                contentType = args.mediaType,
                 controller = controller,
                 viewModel = viewModel
             )

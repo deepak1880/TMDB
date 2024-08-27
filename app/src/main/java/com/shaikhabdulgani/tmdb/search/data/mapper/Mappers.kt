@@ -1,12 +1,12 @@
 package com.shaikhabdulgani.tmdb.search.data.mapper
 
 import com.shaikhabdulgani.tmdb.search.data.remote.dto.SearchResultDto
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 import com.shaikhabdulgani.tmdb.search.domain.model.SearchResult
 
 fun SearchResultDto.toSearchResult(): SearchResult {
     val title = parseTitle()
-    val type = MediaType.parse(this.mediaType)
+    val type = ContentType.parse(this.mediaType)
     return SearchResult(
         id = id,
         title = title,
@@ -21,7 +21,7 @@ fun SearchResultDto.toMovieSearchResult(): SearchResult {
         id = id,
         title = title,
         imageId = posterPath ?: "",
-        type = MediaType.MOVIE,
+        type = ContentType.MOVIE,
     )
 }
 
@@ -31,7 +31,7 @@ fun SearchResultDto.toSeriesSearchResult(): SearchResult {
         id = id,
         title = title,
         imageId = posterPath ?: "",
-        type = MediaType.SERIES,
+        type = ContentType.SERIES,
     )
 }
 
@@ -41,7 +41,7 @@ fun SearchResultDto.toPersonSearchResult(): SearchResult {
         id = id,
         title = title,
         imageId = profilePath ?: "",
-        type = MediaType.PERSON,
+        type = ContentType.PERSON,
     )
 }
 

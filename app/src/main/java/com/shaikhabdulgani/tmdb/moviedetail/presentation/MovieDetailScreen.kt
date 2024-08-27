@@ -63,7 +63,7 @@ import com.shaikhabdulgani.tmdb.moviedetail.domain.model.Genre
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.component.TopSummary
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.util.parseReleaserYear
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.util.toSingleDecimalPlaces
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 import com.shaikhabdulgani.tmdb.ui.theme.ErrorColor
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
 import com.shaikhabdulgani.tmdb.ui.theme.spacing
@@ -71,13 +71,13 @@ import com.shaikhabdulgani.tmdb.ui.theme.spacing
 @Composable
 fun MovieDetailScreen(
     id: Int,
-    mediaType: String = MediaType.MOVIE.getValue(),
+    contentType: String = ContentType.MOVIE.getValue(),
     controller: NavHostController,
     viewModel: MovieDetailViewModel
 ) {
     val context = LocalContext.current
     LaunchedEffect(context) {
-        viewModel.getMovieDetails(id,MediaType.parse(mediaType))
+        viewModel.getMovieDetails(id,ContentType.parse(contentType))
     }
     val movieDetail = viewModel.movieDetail
     Column(
@@ -145,7 +145,7 @@ fun MovieDetailScreen(
         MovieRowWithTitle(
             title = stringResource(R.string.recommendations),
             movies = movieDetail.recommendations,
-            onClick = { controller.navigate(Screen.MovieDetail(it)) }
+            onClick = { controller.navigate(Screen.MovieDetail(it.id)) }
         )
     }
     if (viewModel.isLoading) {
