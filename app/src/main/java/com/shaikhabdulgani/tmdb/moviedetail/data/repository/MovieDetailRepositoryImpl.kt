@@ -8,7 +8,7 @@ import com.shaikhabdulgani.tmdb.moviedetail.data.mapper.toMovieDetailEntity
 import com.shaikhabdulgani.tmdb.moviedetail.data.source.remote.MovieDetailApi
 import com.shaikhabdulgani.tmdb.moviedetail.domain.model.MovieDetail
 import com.shaikhabdulgani.tmdb.moviedetail.domain.repository.MovieDetailRepository
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -19,16 +19,16 @@ class MovieDetailRepositoryImpl @Inject constructor(
 
     override suspend fun getMovieDetail(
         id: Int,
-        mediaType: MediaType
+        contentType: ContentType
     ): Flow<Resource<MovieDetail>> {
         return executeWithFlow {
 
-            val result = movieDetailDao.getMovieDetail(id = id,mediaType = mediaType.getValue())
+            val result = movieDetailDao.getMovieDetail(id = id,mediaType = contentType.getValue())
             if (result != null) {
                 return@executeWithFlow result.toMovieDetail()
             }
 
-            val localDb = movieDetailApi.getMovieDetail(id = id,mediaType = mediaType.getValue()).toMovieDetailEntity(mediaType.getValue())
+            val localDb = movieDetailApi.getMovieDetail(id = id,mediaType = contentType.getValue()).toMovieDetailEntity(contentType.getValue())
             movieDetailDao.insert(localDb)
 
             return@executeWithFlow localDb.toMovieDetail()

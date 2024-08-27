@@ -4,5 +4,5 @@ data class SearchResult(
     val id: Int,
     val title: String,
     val imageId: String,
-    val type: MediaType,
+    val type: ContentType,
 )

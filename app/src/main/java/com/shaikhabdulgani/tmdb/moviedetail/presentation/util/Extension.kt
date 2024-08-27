@@ -1,7 +1,7 @@
 package com.shaikhabdulgani.tmdb.moviedetail.presentation.util
 
 import com.shaikhabdulgani.tmdb.moviedetail.domain.model.MovieDetail
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
+import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 
 fun emptyMovieDetail(): MovieDetail{
     return MovieDetail(
@@ -9,7 +9,7 @@ fun emptyMovieDetail(): MovieDetail{
         "",
         "",
         "",
-        MediaType.MOVIE,
+        ContentType.MOVIE,
         "",
         "",
         "",
