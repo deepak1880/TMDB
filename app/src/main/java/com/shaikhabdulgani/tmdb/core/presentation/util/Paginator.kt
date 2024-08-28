@@ -1,5 +1,6 @@
 package com.shaikhabdulgani.tmdb.core.presentation.util
 
+import android.util.Log
 import com.shaikhabdulgani.tmdb.core.data.util.Result
 
 class Paginator<T> (
@@ -71,6 +72,7 @@ class Paginator<T> (
     }
 
     suspend fun getNext(): Result<List<T>> {
+        Log.d("Paginator::getNext","Fetching page $currentPage")
         onLoading(true)
         val result = onRequest(currentPage)
         when {

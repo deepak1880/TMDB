@@ -53,10 +53,10 @@ fun MovieRowWithTitle(
         title = title,
         containsRow = true
     ) {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            if (movies.isNotEmpty()) {
+        if (movies.isNotEmpty()) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 itemsIndexed(items = movies, key = { i, movie -> "${movie.id}$i" }) { i, item ->
                     if (i == movies.size - 1) {
                         onLastReached()
@@ -74,23 +74,21 @@ fun MovieRowWithTitle(
                         }
                     )
                 }
-            } else {
-                item {
-                    NoDataAvailable()
+                val loadingItemCount = 3
+                if (isLoading) {
+                    items(loadingItemCount) {
+                        LoadingItem(
+                            modifier = when (it) {
+                                loadingItemCount - 1 -> Modifier.padding(end = 20.dp)
+                                0 -> Modifier.padding(start = 20.dp)
+                                else -> Modifier
+                            },
+                        )
+                    }
                 }
             }
-            val loadingItemCount = 3
-            if (isLoading) {
-                items(loadingItemCount) {
-                    LoadingItem(
-                        modifier = when (it) {
-                            loadingItemCount - 1 -> Modifier.padding(end = 20.dp)
-                            0 -> Modifier.padding(start = 20.dp)
-                            else -> Modifier
-                        },
-                    )
-                }
-            }
+        } else {
+            NoDataAvailable()
         }
     }
 }

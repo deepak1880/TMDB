@@ -1,5 +1,10 @@
 package com.shaikhabdulgani.tmdb.search.presentation
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shaikhabdulgani.tmdb.core.data.util.Result
@@ -15,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -27,22 +33,30 @@ class SearchViewModel @Inject constructor(
         MutableStateFlow(QueryState())
     val query: StateFlow<QueryState> = _query
 
-    //        private val _result: MutableStateFlow<List<SearchResult>> =
-//        MutableStateFlow(listOf())
-    private val resultState: MutableStateFlow<SearchState<SearchResult>> =
-        MutableStateFlow(SearchState())
+    private var resultState: SearchState<SearchResult> = SearchState()
+
+    var isLoading by mutableStateOf(false)
+        private set
 
     val result: StateFlow<SearchState<SearchResult>> = _query
+        .onEach {
+            Log.d("SearchViewModel::result::onEach","setting loading to true")
+            isLoading = true
+        }
         .debounce(1000)
         .map {
-            val currentState = resultState.value
+            if (it.query.isEmpty()){
+                return@map SearchState()
+            }
+            val currentState = resultState
             when(it.event){
                 QueryEvent.Page -> {
                     when(val res = paginatedResult.getNext()){
                         is Result.Failure -> {
+                            Log.d("SearchViewModel::result",res.error ?: "cannot get data")
                         }
                         is Result.Success -> {
-                            resultState.value = currentState.copy(
+                            resultState = currentState.copy(
                                 list = currentState.list + res.data!!,
                                 endReached = res.data.isEmpty(),
                             )
@@ -53,9 +67,10 @@ class SearchViewModel @Inject constructor(
                     paginatedResult.reset()
                     when(val res = paginatedResult.getNext()){
                         is Result.Failure -> {
+                            Log.d("SearchViewModel::result",res.error ?: "cannot get data")
                         }
                         is Result.Success -> {
-                            resultState.value = currentState.copy(
+                            resultState = currentState.copy(
                                 list = res.data!!,
                                 endReached = res.data.isEmpty(),
                             )
@@ -63,7 +78,11 @@ class SearchViewModel @Inject constructor(
                     }
                 }
             }
-            resultState.value
+            resultState
+        }
+        .onEach {
+            Log.d("SearchViewModel::result::onEach","setting loading to false")
+            isLoading = false
         }
         .stateIn(
             viewModelScope,
@@ -77,7 +96,9 @@ class SearchViewModel @Inject constructor(
         onRequest = {
             search(queryState = query.value, it)
         },
-        onClear = {}
+        onClear = {
+            resultState = SearchState()
+        }
     )
 
     private suspend fun search(
@@ -105,7 +126,14 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onLoadMore() {
-        _query.value = _query.value.copy(event = QueryEvent.Page)
+        if (!resultState.endReached) {
+            _query.value = _query.value.copy(
+                event = QueryEvent.Page,
+                flip = !_query.value.flip
+            )
+        }else{
+            Log.d("onLoadMore","End reached")
+        }
     }
 
     private fun onQueryChange(query: String) {

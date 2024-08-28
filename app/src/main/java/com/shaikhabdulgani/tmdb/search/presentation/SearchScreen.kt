@@ -1,6 +1,7 @@
 package com.shaikhabdulgani.tmdb.search.presentation
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,8 +24,14 @@ import androidx.compose.material.icons.outlined.ImageNotSupported
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Tv
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,6 +56,8 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.shaikhabdulgani.tmdb.R
 import com.shaikhabdulgani.tmdb.core.data.util.Result
+import com.shaikhabdulgani.tmdb.core.presentation.InputText
+import com.shaikhabdulgani.tmdb.core.presentation.util.shimmer
 import com.shaikhabdulgani.tmdb.core.presentation.util.toast
 import com.shaikhabdulgani.tmdb.global.Constants
 import com.shaikhabdulgani.tmdb.global.Screen
@@ -117,7 +126,7 @@ fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
         ) {
             itemsIndexed(items = result.value.list, key = { _, item -> item.id }) { i, item ->
-                if (i==result.value.list.size-1){
+                if (i == result.value.list.size - 1 && !result.value.endReached) {
                     viewModel.onEvent(SearchEvent.LoadMore)
                 }
                 SearchItem(
@@ -135,6 +144,13 @@ fun SearchScreen(
                             context.toast(context.getString(R.string.unknown_media_navigation_error))
                         }
                     }
+                }
+            }
+            if (viewModel.isLoading) {
+                val totalItems = ((3 - result.value.list.size % 3)) + 6
+                Log.d("result","showing shimmer")
+                items(totalItems) {
+                    SearchItemShimmer()
                 }
             }
         }
@@ -198,6 +214,18 @@ fun SearchSomething(modifier: Modifier = Modifier, message: String) {
 @Composable
 private fun NoDatLayoutPrev() {
     NoDataLayout(message = stringResource(R.string.search_no_data_message))
+}
+
+@Composable
+fun SearchItemShimmer(modifier: Modifier = Modifier) {
+    Box(
+        modifier = Modifier
+            .then(modifier)
+            .height(180.dp)
+            .clip(RoundedCornerShape(MaterialTheme.spacing.defaultSmall))
+            .background(Color.Gray)
+            .shimmer()
+    )
 }
 
 @Composable
@@ -279,6 +307,24 @@ fun SearchItem(
             contentDescription = searchResult.type.getValue()
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopSearchBar(
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior
+) {
+    TopAppBar(
+        modifier = modifier,
+        scrollBehavior = scrollBehavior,
+        title = {
+            TextField(
+                value = "",
+                onValueChange = {}
+            )
+        }
+    )
 }
 
 @Preview
