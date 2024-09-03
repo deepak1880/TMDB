@@ -1,98 +1,81 @@
 package com.shaikhabdulgani.tmdb.auth.presentation.login
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shaikhabdulgani.tmdb.auth.presentation.AuthState
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import com.shaikhabdulgani.tmdb.auth.domain.validation.AuthValidators
 import com.shaikhabdulgani.tmdb.auth.domain.validation.ValidationResult
+import com.shaikhabdulgani.tmdb.auth.presentation.InputTextState
+import com.shaikhabdulgani.tmdb.core.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val validator: AuthValidators
+    private val validator: AuthValidators,
 ) : ViewModel() {
 
-    private val _loginState = mutableStateOf(LoginState())
-    val loginState: State<LoginState>
-        get() = _loginState
+    var emailState by mutableStateOf(InputTextState())
+        private set
+    var passwordState by mutableStateOf(InputTextState())
+        private set
 
-    private val _authState = MutableSharedFlow<AuthState>()
-    val authState: SharedFlow<AuthState> get() = _authState
+    private val _authState = MutableSharedFlow<Resource<User>>()
+    val authState: SharedFlow<Resource<User>> get() = _authState
 
-    fun onEvent(event: LoginEvent) {
+    fun onEvent(event: LoginUiEvent) {
         when (event) {
-            LoginEvent.LoginClick -> login()
-            is LoginEvent.OnEmailChange -> onEmailChange(event.email)
-            is LoginEvent.OnPasswordChange -> onPasswordChange(event.password)
+            LoginUiEvent.LoginClick -> login()
+            is LoginUiEvent.OnEmailChange -> onEmailChange(event.email)
+            is LoginUiEvent.OnPasswordChange -> onPasswordChange(event.password)
         }
     }
 
     private fun onPasswordChange(password: String) {
         val validationResult: ValidationResult = validator.passwordValidator.validate(password)
         if (validationResult.isValid) {
-            _loginState.value = _loginState.value.copy(
-                password = password,
-                passwordError = ""
-            )
+            passwordState = passwordState.noError(password)
             return
         }
-        _loginState.value = _loginState.value.copy(
-            password = password,
-            passwordError = validationResult.error
+        passwordState = InputTextState(
+            value = password,
+            error = validationResult.error
         )
     }
 
     private fun onEmailChange(email: String) {
         val validationResult: ValidationResult = validator.emailValidator.validate(email)
         if (validationResult.isValid) {
-            _loginState.value = _loginState.value.copy(email = email, emailError = "")
+            emailState = emailState.noError(email)
             return
         }
-        _loginState.value =
-            _loginState.value.copy(email = email, emailError = validationResult.error)
+        emailState = InputTextState(
+            value = email,
+            error = validationResult.error
+        )
     }
 
     fun login() = viewModelScope.launch(Dispatchers.IO) {
-
-        _authState.emit(AuthState.Loading)
-
-        val loginState = _loginState.value
-
-        onEmailChange(loginState.emailError)
-        onPasswordChange(loginState.password)
-
-        if (loginState.emailError.isNotBlank() || loginState.passwordError.isNotBlank()) {
+        onEmailChange(emailState.value)
+        onPasswordChange(passwordState.value)
+        if (emailState.error.isNotBlank() || passwordState.error.isNotBlank()) {
             return@launch
         }
 
         authRepository.login(
-            loginState.email,
-            loginState.password
+            email = emailState.value,
+            password = passwordState.value
         ).collect {
-            when (it) {
-                is Resource.Error -> {
-                    _authState.emit(AuthState.Failure(it.message!!))
-                }
-
-                is Resource.Loading -> {
-                    _authState.emit(AuthState.Loading)
-                }
-
-                is Resource.Success -> {
-                    _authState.emit(AuthState.Success(it.data!!.uid))
-                }
-            }
+            _authState.emit(it)
         }
     }
 }

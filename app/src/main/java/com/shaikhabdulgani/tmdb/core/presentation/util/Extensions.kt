@@ -79,3 +79,12 @@ fun Context.toast(message: String) {
     toast?.cancel()
     toast = Toast.makeText(this, message, Toast.LENGTH_SHORT).also { it.show() }
 }
+
+fun String.getInitials(): String {
+    val username = trim()
+    return if (username.length<=1){
+        this
+    }else{
+        username[0].toString() + username[1].toString()
+    }
+}

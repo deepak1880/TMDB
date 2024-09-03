@@ -4,5 +4,5 @@ data class User(
     val uid: String,
     val username: String,
     val email: String,
-    val favorites: Array<String>,
+    val favorites: List<String>,
 )

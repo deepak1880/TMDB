@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.StarOutline
@@ -68,6 +69,7 @@ fun TopSummary(
     description: String,
     backdropPath: String,
     posterPath: String,
+    isBookmarked: Boolean,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -186,7 +188,7 @@ fun TopSummary(
                 .background(color = Black50)
                 .padding(7.dp)
                 .clickable { onSaveClick() },
-            imageVector = Icons.Filled.BookmarkBorder,
+            imageVector = if(isBookmarked) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
             contentDescription = stringResource(R.string.save),
             tint = White
         )

@@ -63,6 +63,7 @@ open class BaseRepository {
             Result.failure(e.message)
         } catch (e: Exception) {
             Log.e(TAG, "Error In Repository: ${e.message}")
+            e.printStackTrace()
             Result.failure(e.message)
         }
     }

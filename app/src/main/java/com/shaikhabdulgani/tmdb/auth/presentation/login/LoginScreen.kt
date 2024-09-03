@@ -40,8 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shaikhabdulgani.tmdb.R
-import com.shaikhabdulgani.tmdb.auth.presentation.AuthState
-import com.shaikhabdulgani.tmdb.auth.domain.model.LoginResult
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import com.shaikhabdulgani.tmdb.auth.domain.validation.AuthValidators
@@ -52,6 +50,8 @@ import com.shaikhabdulgani.tmdb.core.presentation.DialogContent
 import com.shaikhabdulgani.tmdb.core.presentation.GradientButton
 import com.shaikhabdulgani.tmdb.core.presentation.InputText
 import com.shaikhabdulgani.tmdb.auth.domain.validation.RepeatPasswordValidator
+import com.shaikhabdulgani.tmdb.core.domain.model.User
+import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyAuthRepo
 import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.GradientEnd
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
@@ -75,16 +75,18 @@ fun LoginScreen(
     LaunchedEffect(context) {
         viewModel.authState.collectLatest {
             when (it) {
-                is AuthState.Failure -> {
-                    Toast.makeText(context, it.error, Toast.LENGTH_SHORT).show()
+                is Resource.Error -> {
+                    if (!it.message.isNullOrBlank()) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
                     showDialog = false
                 }
 
-                AuthState.Loading -> {
+                is Resource.Loading -> {
                     showDialog = true
                 }
 
-                is AuthState.Success -> {
+                is Resource.Success -> {
                     onLoginSuccess()
                     showDialog = false
                 }
@@ -119,7 +121,6 @@ fun LoginScreen(
                 .background(color = DarkBg)
                 .padding(MaterialTheme.spacing.default)
         ) {
-            val (email, emailError, password, passwordError) = viewModel.loginState.value
             Text(
                 modifier = Modifier.padding(top = MaterialTheme.spacing.defaultSmall),
                 text = stringResource(id = R.string.login),
@@ -141,20 +142,20 @@ fun LoginScreen(
                 label = stringResource(R.string.email),
                 placeholder = stringResource(R.string.email_placeholder),
                 icon = Icons.Outlined.Email,
-                value = email,
+                value = viewModel.emailState.value,
                 keyboardType = KeyboardType.Email,
-                errorMessage = emailError,
-                onTextChange = { viewModel.onEvent(LoginEvent.OnEmailChange(it)) }
+                errorMessage = viewModel.emailState.error,
+                onTextChange = { viewModel.onEvent(LoginUiEvent.OnEmailChange(it)) }
             )
             InputText(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(R.string.password),
                 placeholder = stringResource(R.string.password_placeholder),
                 icon = Icons.Outlined.Lock,
-                value = password,
+                value = viewModel.passwordState.value,
                 keyboardType = KeyboardType.Password,
-                errorMessage = passwordError,
-                onTextChange = { viewModel.onEvent(LoginEvent.OnPasswordChange(it)) },
+                errorMessage = viewModel.passwordState.error,
+                onTextChange = { viewModel.onEvent(LoginUiEvent.OnPasswordChange(it)) },
                 isPassword = true,
             )
 
@@ -178,7 +179,7 @@ fun LoginScreen(
             GradientButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    viewModel.onEvent(LoginEvent.LoginClick)
+                    viewModel.onEvent(LoginUiEvent.LoginClick)
                 }
             ) {
                 Text(text = stringResource(R.string.login))
@@ -215,22 +216,7 @@ private fun LoginPreview() {
             onLoginSuccess = {},
             onSignUpClick = {},
             viewModel = LoginViewModel(
-                object : AuthRepository {
-                    override suspend fun login(
-                        email: String,
-                        password: String
-                    ): Flow<Resource<LoginResult>> {
-                        return flow { }
-                    }
-
-                    override suspend fun signUp(
-                        email: String,
-                        username: String,
-                        password: String
-                    ): Flow<Resource<LoginResult>> {
-                        return flow { }
-                    }
-                },
+                DummyAuthRepo,
                 AuthValidators(
                     emailValidator = EmailValidator(),
                     passwordValidator = PasswordValidator(),

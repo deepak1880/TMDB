@@ -1,8 +1,9 @@
-package com.shaikhabdulgani.tmdb.core.data.local
+package com.shaikhabdulgani.tmdb.core.data.source.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.shaikhabdulgani.tmdb.core.data.source.local.entity.UserEntity
 import com.shaikhabdulgani.tmdb.home.data.local.dao.MovieDao
 import com.shaikhabdulgani.tmdb.home.data.local.dao.SeriesDao
 import com.shaikhabdulgani.tmdb.home.data.local.entity.MovieEntity
@@ -15,13 +16,20 @@ import com.shaikhabdulgani.tmdb.moviedetail.data.source.local.entity.MovieDetail
     entities = [
         MovieEntity::class,
         SeriesEntity::class,
-        MovieDetailEntity::class
+        MovieDetailEntity::class,
+        UserEntity::class
    ],
     version = 1
 )
-@TypeConverters(MovieDetailConverters::class)
+@TypeConverters(
+    value = [
+        MovieDetailConverters::class,
+//        UserConverter::class
+    ]
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
-    abstract val seriesDto: SeriesDao
+    abstract val seriesDao: SeriesDao
     abstract val movieDetailDao: MovieDetailDao
+    abstract val userDao: UserDao
 }

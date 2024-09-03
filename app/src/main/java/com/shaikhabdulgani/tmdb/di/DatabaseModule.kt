@@ -2,8 +2,12 @@ package com.shaikhabdulgani.tmdb.di
 
 import android.content.Context
 import androidx.room.Room
-import com.shaikhabdulgani.tmdb.core.data.local.AppDatabase
+import com.shaikhabdulgani.tmdb.core.data.source.local.AppDatabase
+import com.shaikhabdulgani.tmdb.core.data.source.local.UserConverter
+import com.shaikhabdulgani.tmdb.core.data.source.local.UserDao
 import com.shaikhabdulgani.tmdb.home.data.local.dao.MovieDao
+import com.shaikhabdulgani.tmdb.home.data.local.dao.SeriesDao
+import com.shaikhabdulgani.tmdb.moviedetail.data.source.local.MovieDetailConverters
 import com.shaikhabdulgani.tmdb.moviedetail.data.source.local.MovieDetailDao
 import dagger.Module
 import dagger.Provides
@@ -36,14 +40,20 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideSeriesDao(appDatabase: AppDatabase): MovieDao {
-        return appDatabase.movieDao
+    fun provideSeriesDao(appDatabase: AppDatabase): SeriesDao {
+        return appDatabase.seriesDao
     }
 
     @Provides
     @Singleton
     fun provideMovieDetailDao(appDatabase: AppDatabase): MovieDetailDao {
         return appDatabase.movieDetailDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDao(appDatabase: AppDatabase): UserDao {
+        return appDatabase.userDao
     }
 
 }

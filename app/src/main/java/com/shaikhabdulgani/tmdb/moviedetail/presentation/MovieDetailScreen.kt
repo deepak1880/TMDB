@@ -1,5 +1,3 @@
-@file:Suppress("SameParameterValue")
-
 package com.shaikhabdulgani.tmdb.moviedetail.presentation
 
 import androidx.compose.foundation.Image
@@ -97,8 +95,9 @@ fun MovieDetailScreen(
             runtime = stringResource(id = R.string.runtime_args, movieDetail.runtime),
             genre = if (movieDetail.genres.isNotEmpty()) movieDetail.genres[0].name else "",
             rating = movieDetail.rating.toSingleDecimalPlaces(),
+            isBookmarked = viewModel.isBookmarked,
             onBackClick = { controller.navigateUp() },
-            onSaveClick = { println(id) }
+            onSaveClick = { viewModel.onEvent(DetailEvent.BookmarkClick) }
         )
 
         GradientButton(

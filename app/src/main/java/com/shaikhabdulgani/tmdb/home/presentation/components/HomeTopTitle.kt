@@ -1,8 +1,8 @@
 package com.shaikhabdulgani.tmdb.home.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,16 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shaikhabdulgani.tmdb.R
+import com.shaikhabdulgani.tmdb.core.presentation.util.getInitials
 import com.shaikhabdulgani.tmdb.ui.theme.White
 
 @Composable
-fun HomeTopTitle(modifier: Modifier = Modifier) {
+fun HomeTopTitle(modifier: Modifier = Modifier, username: String) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -36,18 +37,23 @@ fun HomeTopTitle(modifier: Modifier = Modifier) {
             lineHeight = 30.sp,
             fontWeight = FontWeight.Bold,
         )
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = "",
+        Box(
             modifier = Modifier
                 .padding(5.dp)
                 .size(40.dp)
                 .clip(CircleShape)
                 .border(
-                    width = 2.dp,
+                    width = 1.dp,
                     color = White,
                     shape = CircleShape
-                )
-        )
+                ),
+            contentAlignment = Alignment.Center
+        ){
+            Text(
+                text = username.getInitials(),
+                textAlign = TextAlign.Center,
+                color = White
+            )
+        }
     }
 }

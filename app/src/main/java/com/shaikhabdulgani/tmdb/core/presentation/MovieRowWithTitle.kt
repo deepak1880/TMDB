@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -88,7 +90,9 @@ fun MovieRowWithTitle(
                 }
             }
         } else {
-            NoDataAvailable()
+            NoDataAvailable(
+                modifier.padding(horizontal = MaterialTheme.spacing.default)
+            )
         }
     }
 }
@@ -182,7 +186,7 @@ private fun NoDataAvailable(
 
     Column(
         modifier
-            .size(height = 180.dp, width = 120.dp),
+            .height(180.dp),
         verticalArrangement = Arrangement.spacedBy(
             space = MaterialTheme.spacing.default,
             alignment = Alignment.CenterVertically
@@ -190,12 +194,14 @@ private fun NoDataAvailable(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
+            modifier = modifier.fillMaxHeight(0.7f),
             painter = painterResource(id = R.drawable.img_no_data),
             contentDescription = ""
         )
         Text(
             text = "No data available",
-            color = Gray
+            color = Gray,
+            textAlign = TextAlign.Center
         )
     }
 }
