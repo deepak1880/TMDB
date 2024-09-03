@@ -50,7 +50,7 @@ fun OnboardingScreen(controller: NavHostController) {
     val subtitle = stringResource(R.string.onboard_subtitle)
     val buttonText = stringResource(R.string.explore)
     val backgroundImage: Int = R.drawable.bg_onboarding
-    val onClick = { controller.navigate(Screen.Home) }
+    val onClick = { controller.navigate(Screen.SignUp) }
 
     Box(
         modifier = Modifier

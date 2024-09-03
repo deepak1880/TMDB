@@ -1,15 +1,16 @@
 package com.shaikhabdulgani.tmdb.auth.presentation.signup
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shaikhabdulgani.tmdb.auth.presentation.AuthState
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import com.shaikhabdulgani.tmdb.auth.domain.validation.AuthValidators
 import com.shaikhabdulgani.tmdb.auth.domain.validation.ValidationResult
-import com.shaikhabdulgani.tmdb.core.domain.repository.UserRepository
+import com.shaikhabdulgani.tmdb.auth.presentation.InputTextState
+import com.shaikhabdulgani.tmdb.core.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,16 +21,20 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
     private val validator: AuthValidators
 ) : ViewModel() {
 
-    private val _signUpState = mutableStateOf(SignUpState())
-    val signUpState: State<SignUpState>
-        get() = _signUpState
+    var emailState by mutableStateOf(InputTextState())
+        private set
+    var passwordState by mutableStateOf(InputTextState())
+        private set
+    var rePasswordState by mutableStateOf(InputTextState())
+        private set
+    var usernameState by mutableStateOf(InputTextState())
+        private set
 
-    private val _authState = MutableSharedFlow<AuthState>()
-    val authState: SharedFlow<AuthState> get() = _authState
+    private val _authState = MutableSharedFlow<Resource<User>>()
+    val authState: SharedFlow<Resource<User>> get() = _authState
 
     fun onEvent(event: SignUpEvent) {
         when (event) {
@@ -43,110 +48,79 @@ class SignUpViewModel @Inject constructor(
 
     private fun onRePasswordChange(password: String) {
         val validationResult: ValidationResult =
-            validator.rePasswordValidator.validate(Pair(password, signUpState.value.password))
+            validator.rePasswordValidator.validate(Pair(password, passwordState.value))
         if (validationResult.isValid) {
-            _signUpState.value = _signUpState.value.copy(
-                repeatPassword = password,
-                repeatPasswordError = ""
-            )
+            rePasswordState = rePasswordState.noError(password)
             return
         }
-        _signUpState.value = _signUpState.value.copy(
-            repeatPassword = password,
-            repeatPasswordError = validationResult.error
+        rePasswordState = InputTextState(
+            value = password,
+            error = validationResult.error
         )
     }
 
     private fun onUsernameChange(username: String) {
         val validationResult: ValidationResult = validator.usernameValidator.validate(username)
         if (validationResult.isValid) {
-            _signUpState.value = _signUpState.value.copy(
-                username = username,
-                usernameError = ""
-            )
+            usernameState = usernameState.noError(username)
             return
         }
-        _signUpState.value = _signUpState.value.copy(
-            username = username,
-            usernameError = validationResult.error
+        usernameState = InputTextState(
+            value = username,
+            error = validationResult.error
         )
     }
 
     private fun onPasswordChange(password: String) {
         val validationResult: ValidationResult = validator.passwordValidator.validate(password)
         if (validationResult.isValid) {
-            _signUpState.value = _signUpState.value.copy(
-                password = password,
-                passwordError = ""
-            )
+            passwordState = passwordState.noError(password)
             return
         }
-        _signUpState.value = _signUpState.value.copy(
-            password = password,
-            passwordError = validationResult.error
+        passwordState = InputTextState(
+            value = password,
+            error = validationResult.error
         )
     }
 
     private fun onEmailChange(email: String) {
         val validationResult: ValidationResult = validator.emailValidator.validate(email)
         if (validationResult.isValid) {
-            _signUpState.value = _signUpState.value.copy(email = email, emailError = "")
+            emailState = emailState.noError(email)
             return
         }
-        _signUpState.value =
-            _signUpState.value.copy(email = email, emailError = validationResult.error)
+        emailState = InputTextState(
+            value = email,
+            error = validationResult.error
+        )
     }
 
     private fun signUp() = viewModelScope.launch(Dispatchers.IO) {
-        val signUpState = _signUpState.value
-
-        onEmailChange(signUpState.emailError)
-        onPasswordChange(signUpState.password)
-        onUsernameChange(signUpState.password)
-
-        if (
-            signUpState.emailError.isNotBlank() ||
-            signUpState.passwordError.isNotBlank() ||
-            signUpState.usernameError.isNotBlank()
-        ) {
+        validateEveryField()
+        if (!isEveryFieldValid()) {
             return@launch
         }
-
-        _authState.emit(AuthState.Loading)
-
         authRepository.signUp(
-            email = signUpState.email,
-            username = signUpState.username,
-            password = signUpState.password
+            email = emailState.value,
+            username = usernameState.value,
+            password = passwordState.value
         ).collect {
-            when (it) {
-                is Resource.Error -> {
-                    _authState.emit(AuthState.Failure(it.message!!))
-                }
-
-                is Resource.Loading -> {
-                    _authState.emit(AuthState.Loading)
-                }
-
-                is Resource.Success -> {
-                    userRepository.addUser(
-                        email = signUpState.email,
-                        username = signUpState.username
-                    ).collect { resource ->
-                        when (resource) {
-                            is Resource.Error -> {
-                                _authState.emit(AuthState.Failure(it.message!!))
-                            }
-
-                            is Resource.Loading -> {}
-                            is Resource.Success -> {
-                                _authState.emit(AuthState.Success(""))
-                            }
-                        }
-                    }
-                }
-            }
+            _authState.emit(it)
         }
+    }
+
+    private fun validateEveryField() {
+        onEmailChange(emailState.value)
+        onPasswordChange(passwordState.value)
+        onRePasswordChange(rePasswordState.value)
+        onUsernameChange(usernameState.value)
+    }
+
+    private fun isEveryFieldValid(): Boolean {
+        return emailState.value.isNotBlank() ||
+                passwordState.value.isNotBlank() ||
+//                rePasswordState.value.isNotBlank() ||
+                usernameState.value.isNotBlank()
     }
 }
 

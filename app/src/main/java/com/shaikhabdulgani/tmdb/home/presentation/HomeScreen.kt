@@ -29,16 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import com.shaikhabdulgani.tmdb.R
-import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.global.Screen
 import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
 import com.shaikhabdulgani.tmdb.ui.theme.TMDBTheme
 import com.shaikhabdulgani.tmdb.ui.theme.Transparent
 import com.shaikhabdulgani.tmdb.core.presentation.MovieRowWithTitle
+import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyAuthRepo
+import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyHomeRepo
 import com.shaikhabdulgani.tmdb.core.presentation.util.noRippleClickable
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
-import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
 import com.shaikhabdulgani.tmdb.home.presentation.components.HomeTopTitle
 import com.shaikhabdulgani.tmdb.home.presentation.components.TabLayout
 import com.shaikhabdulgani.tmdb.home.presentation.util.HomeTab
@@ -53,12 +52,13 @@ fun HomeScreen(
     controller: NavHostController,
     viewModel: HomeViewModel
 ) {
-    val context = LocalContext.current
-    LaunchedEffect(context) {
+
+    LaunchedEffect(true) {
         viewModel.loadUpcomingMovies()
         viewModel.loadTrendingMovies()
         viewModel.loadPopularSeries()
         viewModel.loadOnTheAirSeries()
+        viewModel.fetchUsername()
     }
     Column(
         Modifier
@@ -83,20 +83,10 @@ fun HomeScreen(
                     start = MaterialTheme.spacing.default,
                     end = MaterialTheme.spacing.default,
                     top = MaterialTheme.spacing.extraLarge
-                )
+                ),
+            username = viewModel.username
         )
 
-//        SearchBar(
-//            modifier = Modifier
-//                .noRippleClickable {
-//                    controller.navigate(Screen.Search)
-//                }
-//                .fillMaxWidth()
-//                .padding(horizontal = MaterialTheme.spacing.default),
-//            query = "",
-//            onQueryChange = {  },
-//            onSearch = {  },
-//        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,23 +213,10 @@ private fun HomePreview() {
     TMDBTheme {
         HomeScreen(
             NavHostController(LocalContext.current),
-            viewModel = HomeViewModel(object : HomeRepository {
-                override suspend fun getTrendingMovies(page: Int): Result<List<Movie>> {
-                    return Result.failure()
-                }
-
-                override suspend fun getUpcomingMovies(page: Int): Result<List<Movie>> {
-                    return Result.failure()
-                }
-
-                override suspend fun getPopularSeries(page: Int): Result<List<Movie>> {
-                    return Result.failure()
-                }
-
-                override suspend fun getOnTheAirSeries(page: Int): Result<List<Movie>> {
-                    return Result.failure()
-                }
-            })
+            viewModel = HomeViewModel(
+                DummyHomeRepo,
+                DummyAuthRepo,
+            )
         )
     }
 }

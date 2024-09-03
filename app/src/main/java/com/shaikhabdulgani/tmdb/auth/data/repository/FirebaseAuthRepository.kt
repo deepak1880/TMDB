@@ -3,33 +3,42 @@ package com.shaikhabdulgani.tmdb.auth.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.shaikhabdulgani.tmdb.base.BaseRepository
 import com.shaikhabdulgani.tmdb.core.data.util.await
-import com.shaikhabdulgani.tmdb.auth.domain.model.LoginResult
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
+import com.shaikhabdulgani.tmdb.core.data.util.Result
+import com.shaikhabdulgani.tmdb.core.domain.model.User
+import com.shaikhabdulgani.tmdb.core.domain.repository.UserRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
+    private val userRepository: UserRepository
 ) : AuthRepository, BaseRepository() {
-    override suspend fun login(email: String, password: String): Flow<Resource<LoginResult>> {
+    override suspend fun login(email: String, password: String): Flow<Resource<User>> {
         return executeWithFlow {
-            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
 
-            if (!result.isSuccessful || result.result == null || result.result.user == null) {
+            if (!authResult.isSuccessful || authResult.result == null || authResult.result.user == null) {
                 //unsuccessful case
-                if (result.exception != null && result.exception!!.message != null) {
-                    throw Exception(result.exception!!.message!!)
+                if (authResult.exception != null && authResult.exception!!.message != null) {
+                    throw Exception(authResult.exception!!.message!!)
                 } else {
                     // unknown unsuccessful case
                     throw Exception("Some error occurred")
                 }
             }
 
-            //success case
-            return@executeWithFlow LoginResult(
-                result.result!!.user!!.uid
-            )
+            val user = when(val userResult = userRepository.getUser(true, authResult.result.user!!.uid)){
+                is Result.Failure -> {
+                    throw Exception(userResult.error)
+                }
+
+                is Result.Success -> {
+                    userResult.data!!
+                }
+            }
+            return@executeWithFlow user
         }
     }
 
@@ -37,22 +46,42 @@ class FirebaseAuthRepository @Inject constructor(
         email: String,
         username: String,
         password: String
-    ): Flow<Resource<LoginResult>> {
+    ): Flow<Resource<User>> {
         return executeWithFlow {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-
-            //success case
-            if (result.isSuccessful && result.result != null && result.result.user != null) {
-                return@executeWithFlow LoginResult(result.result!!.user!!.uid)
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            if (!authResult.isSuccessful || authResult.result == null || authResult.result.user == null) {
+                //unsuccessful case
+                if (authResult.exception != null && authResult.exception!!.message != null) {
+                    throw Exception(authResult.exception!!.message!!)
+                } else {
+                    // unknown unsuccessful case
+                    throw Exception("Some error occurred")
+                }
             }
 
-            //unsuccessful case
-            if (result.exception != null && result.exception!!.message != null) {
-                throw Exception(result.exception!!.message!!)
-            }
+            val userResult = userRepository.addUser(
+                uid = authResult.result.user!!.uid,
+                username = username,
+                email = email
+            )
+            val user = when(userResult){
+                is Result.Failure -> {
+                    throw Exception(userResult.error)
+                }
 
-            // unknown unsuccessful case
-            throw Exception("Some error occurred")
+                is Result.Success -> {
+                    userResult.data!!
+                }
+            }
+            return@executeWithFlow user
         }
     }
+
+    override fun isLoggedIn(): Boolean = auth.currentUser != null
+
+    override suspend fun uuid() = auth.currentUser?.uid ?: ""
+
+    override suspend fun getLoggedInUser() = userRepository.getUser(false,uuid() ?: "").data
+
+    override suspend fun logout() = auth.signOut()
 }

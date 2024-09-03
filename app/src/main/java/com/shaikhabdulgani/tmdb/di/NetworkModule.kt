@@ -1,6 +1,7 @@
 package com.shaikhabdulgani.tmdb.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.shaikhabdulgani.tmdb.BuildConfig
 import com.shaikhabdulgani.tmdb.global.AuthInterceptor
 import com.shaikhabdulgani.tmdb.global.Constants
@@ -32,6 +33,12 @@ class NetworkModule {
     @Singleton
     fun providesFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun providesFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
     }
 
     @Provides

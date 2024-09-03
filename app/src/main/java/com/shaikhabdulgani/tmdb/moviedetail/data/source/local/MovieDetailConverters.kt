@@ -43,42 +43,12 @@ class MovieDetailConverters {
         return gson.fromJson(string, RecommendationMovieEntity::class.java)
     }
 
-//    @TypeConverters
-//    fun toList(string: String): List<RecommendationMovieEntity> {
-//        return gson.fromJson(string, object : TypeToken<List<RecommendationMovieEntity>>() {}.type)
-//    }
-//
-//    @TypeConverters
-//    fun fromList(list: List<RecommendationMovieEntity>): String {
-//        return gson.toJson(list.toTypedArray())
-//    }
-//
-//    @TypeConverters
-//    fun toGenreEntityList(string: String): List<GenreEntity> {
-//        return gson.fromJson(string, object : TypeToken<List<GenreEntity>>() {}.type)
-//    }
-//
-//    @TypeConverters
-//    fun fromGenreEntityList(list: List<GenreEntity>): String {
-//        return gson.toJson(list.toTypedArray())
-//    }
-//
-//    @TypeConverters
-//    fun toCastEntityList(string: String): List<CastEntity> {
-//        return gson.fromJson(string, object : TypeToken<List<CastEntity>>() {}.type)
-//    }
-//
-//    @TypeConverters
-//    fun fromCastEntityList(list: List<CastEntity>): String {
-//        return gson.toJson(list.toTypedArray())
-//    }
-
-    @TypeConverters
+    @TypeConverter
     fun toList(string: String): List<String> {
         return gson.fromJson(string, object : TypeToken<List<String>>() {}.type)
     }
 
-    @TypeConverters
+    @TypeConverter
     fun fromList(list: List<String>): String {
         return gson.toJson(list.toTypedArray())
     }

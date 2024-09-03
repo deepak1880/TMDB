@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.presentation.util.PaginatedListState
 import com.shaikhabdulgani.tmdb.core.presentation.util.Paginator
 import com.shaikhabdulgani.tmdb.home.domain.model.Movie
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+    private val homeRepository: HomeRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     companion object {
@@ -27,17 +29,29 @@ class HomeViewModel @Inject constructor(
 
     var trendingMovies by
     mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+        private set
 
     var upcomingMovies by
     mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+        private set
 
     var onTheAirSeries by
     mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+        private set
 
     var popularSeries by
     mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+        private set
 
     var currentActiveTab by mutableStateOf(HomeTab.MOVIES)
+
+    var username by mutableStateOf("")
+        private set
+
+    fun fetchUsername() = viewModelScope.launch(Dispatchers.IO) {
+        val user = authRepository.getLoggedInUser()
+        username = user?.username ?: "NA"
+    }
 
     private val trendingMoviePaginator = Paginator(
         initialPage = 1,
@@ -48,11 +62,7 @@ class HomeViewModel @Inject constructor(
             }.await()
         },
         getNextPage = { _, _ -> trendingMovies.page + 1 },
-        onError = {
-//            trendingMovies = trendingMovies.copy(
-//                endReached = true
-//            )
-        },
+        onError = { },
         onSuccess = { items, newPage ->
             trendingMovies = trendingMovies.copy(
                 list = trendingMovies.list + items,
@@ -145,13 +155,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadPopularSeries() = viewModelScope.launch {
+
+    fun loadPopularSeries() = viewModelScope.launch(Dispatchers.IO) {
         if (!popularSeries.endReached && !popularSeries.isLoading) {
             popularSeriesPaginator.loadNext()
         }
     }
-
-    fun loadOnTheAirSeries() = viewModelScope.launch {
+    fun loadOnTheAirSeries() = viewModelScope.launch(Dispatchers.IO) {
         if (!onTheAirSeries.endReached && !onTheAirSeries.isLoading) {
             onTheAirSeriesPaginator.loadNext()
         }

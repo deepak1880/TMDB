@@ -41,12 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.shaikhabdulgani.tmdb.R
-import com.shaikhabdulgani.tmdb.auth.presentation.AuthState
 import com.shaikhabdulgani.tmdb.core.presentation.DialogContent
 import com.shaikhabdulgani.tmdb.global.Screen
 import com.shaikhabdulgani.tmdb.core.presentation.GradientButton
 import com.shaikhabdulgani.tmdb.core.presentation.InputText
-import com.shaikhabdulgani.tmdb.auth.domain.model.LoginResult
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
 import com.shaikhabdulgani.tmdb.auth.domain.validation.AuthValidators
@@ -55,7 +53,7 @@ import com.shaikhabdulgani.tmdb.auth.domain.validation.PasswordValidator
 import com.shaikhabdulgani.tmdb.auth.domain.validation.RepeatPasswordValidator
 import com.shaikhabdulgani.tmdb.auth.domain.validation.UsernameValidator
 import com.shaikhabdulgani.tmdb.core.domain.model.User
-import com.shaikhabdulgani.tmdb.core.domain.repository.UserRepository
+import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyAuthRepo
 import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.GradientEnd
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
@@ -78,16 +76,18 @@ fun SignUpScreen(
     LaunchedEffect(context) {
         viewModel.authState.collectLatest {
             when (it) {
-                is AuthState.Failure -> {
-                    Toast.makeText(context, it.error, Toast.LENGTH_SHORT).show()
+                is Resource.Error -> {
+                    if (!it.message.isNullOrBlank()) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
                     showDialog = false
                 }
 
-                AuthState.Loading -> {
+                is Resource.Loading -> {
                     showDialog = true
                 }
 
-                is AuthState.Success -> {
+                is Resource.Success -> {
                     controller.navigate(Screen.Home)
                     showDialog = false
                 }
@@ -112,19 +112,15 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.default),
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = MaterialTheme.spacing.default, topEnd = MaterialTheme.spacing.default))
+                .clip(
+                    RoundedCornerShape(
+                        topStart = MaterialTheme.spacing.default,
+                        topEnd = MaterialTheme.spacing.default
+                    )
+                )
                 .background(color = DarkBg)
                 .padding(MaterialTheme.spacing.default)
         ) {
-            val (
-                email,
-                emailError,
-                username,
-                usernameError,
-                password,
-                passwordError
-            ) = viewModel.signUpState.value
-
             Text(
                 modifier = Modifier.padding(top = MaterialTheme.spacing.defaultSmall),
                 text = stringResource(R.string.sign_up),
@@ -146,9 +142,9 @@ fun SignUpScreen(
                 label = "Username",
                 placeholder = "BugsBunny1",
                 icon = Icons.Outlined.Email,
-                value = username,
+                value = viewModel.usernameState.value,
                 keyboardType = KeyboardType.Text,
-                errorMessage = usernameError,
+                errorMessage = viewModel.usernameState.error,
                 onTextChange = { viewModel.onEvent(SignUpEvent.OnUsernameChange(it)) }
             )
             InputText(
@@ -156,9 +152,9 @@ fun SignUpScreen(
                 label = stringResource(R.string.email),
                 placeholder = stringResource(R.string.email_placeholder),
                 icon = Icons.Outlined.Email,
-                value = email,
+                value = viewModel.emailState.value,
                 keyboardType = KeyboardType.Email,
-                errorMessage = emailError,
+                errorMessage = viewModel.emailState.error,
                 onTextChange = { viewModel.onEvent(SignUpEvent.OnEmailChange(it)) }
             )
             InputText(
@@ -166,9 +162,9 @@ fun SignUpScreen(
                 label = stringResource(R.string.password),
                 placeholder = stringResource(R.string.password_placeholder),
                 icon = Icons.Outlined.Lock,
-                value = password,
+                value = viewModel.passwordState.value,
                 keyboardType = KeyboardType.Password,
-                errorMessage = passwordError,
+                errorMessage = viewModel.passwordState.error,
                 onTextChange = { viewModel.onEvent(SignUpEvent.OnPasswordChange(it)) },
                 isPassword = true,
             )
@@ -210,41 +206,13 @@ private fun LoginPreview() {
         SignUpScreen(
             NavHostController(LocalContext.current),
             viewModel = SignUpViewModel(
-                object : AuthRepository {
-                    override suspend fun login(
-                        email: String,
-                        password: String
-                    ): Flow<Resource<LoginResult>> {
-                        return flow {  }
-                    }
-
-                    override suspend fun signUp(
-                        email: String,
-                        username: String,
-                        password: String
-                    ): Flow<Resource<LoginResult>> {
-                        return flow {  }
-                    }
-
-                },
+                DummyAuthRepo,
                 validator = AuthValidators(
                     emailValidator = EmailValidator(),
                     passwordValidator = PasswordValidator(),
                     rePasswordValidator = RepeatPasswordValidator(),
                     usernameValidator = UsernameValidator(),
                 ),
-                userRepository = object :UserRepository{
-                    override suspend fun getUser(): Flow<Resource<User>> {
-                        return flow {  }
-                    }
-
-                    override suspend fun addUser(
-                        username: String,
-                        email: String
-                    ): Flow<Resource<User>> {
-                        return flow {  }
-                    }
-                }
             )
         )
     }
