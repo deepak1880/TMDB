@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.shaikhabdulgani.tmdb.auth.domain.repository.AuthRepository
 import com.shaikhabdulgani.tmdb.core.presentation.util.PaginatedListState
 import com.shaikhabdulgani.tmdb.core.presentation.util.Paginator
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
 import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
 import com.shaikhabdulgani.tmdb.home.presentation.util.HomeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,19 +28,19 @@ class HomeViewModel @Inject constructor(
     }
 
     var trendingMovies by
-    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+    mutableStateOf<PaginatedListState<Media>>(PaginatedListState(page = 1))
         private set
 
     var upcomingMovies by
-    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+    mutableStateOf<PaginatedListState<Media>>(PaginatedListState(page = 1))
         private set
 
     var onTheAirSeries by
-    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+    mutableStateOf<PaginatedListState<Media>>(PaginatedListState(page = 1))
         private set
 
     var popularSeries by
-    mutableStateOf<PaginatedListState<Movie>>(PaginatedListState(page = 1))
+    mutableStateOf<PaginatedListState<Media>>(PaginatedListState(page = 1))
         private set
 
     var currentActiveTab by mutableStateOf(HomeTab.MOVIES)

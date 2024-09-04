@@ -54,7 +54,7 @@ import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.LightGray
 import com.shaikhabdulgani.tmdb.ui.theme.Shapes
 import com.shaikhabdulgani.tmdb.ui.theme.White
-import com.shaikhabdulgani.tmdb.core.presentation.MovieRowWithTitle
+import com.shaikhabdulgani.tmdb.core.presentation.MediaRow
 import com.shaikhabdulgani.tmdb.global.Constants
 import com.shaikhabdulgani.tmdb.moviedetail.domain.model.Cast
 import com.shaikhabdulgani.tmdb.moviedetail.domain.model.Genre
@@ -141,7 +141,7 @@ fun MovieDetailScreen(
             }
         }
 
-        MovieRowWithTitle(
+        MediaRow(
             title = stringResource(R.string.recommendations),
             movies = movieDetail.recommendations,
             onClick = { controller.navigate(Screen.MovieDetail(it.id)) }

@@ -4,7 +4,8 @@ import com.shaikhabdulgani.tmdb.home.data.remote.model.MovieDto
 import com.shaikhabdulgani.tmdb.home.data.remote.model.SeriesDto
 import com.shaikhabdulgani.tmdb.home.data.local.entity.MovieEntity
 import com.shaikhabdulgani.tmdb.home.data.local.entity.SeriesEntity
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 
 fun MovieDto.toEntity(category: String, rank: Int): MovieEntity {
     return MovieEntity(
@@ -17,19 +18,21 @@ fun MovieDto.toEntity(category: String, rank: Int): MovieEntity {
     )
 }
 
-fun MovieEntity.toMovie(): Movie {
-    return Movie(
+fun MovieEntity.toMovie(): Media {
+    return Media(
         id = id,
         title = title,
-        imageId = imageId
+        imageId = imageId,
+        mediaType = MediaType.MOVIE
     )
 }
 
-fun SeriesEntity.toMovie(): Movie {
-    return Movie(
+fun SeriesEntity.toMovie(): Media {
+    return Media(
         id = id,
         title = title,
-        imageId = imageId
+        imageId = imageId,
+        mediaType = MediaType.SERIES
     )
 }
 

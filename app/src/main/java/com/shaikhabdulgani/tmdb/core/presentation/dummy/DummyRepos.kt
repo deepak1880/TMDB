@@ -5,24 +5,24 @@ import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.core.domain.model.User
 import com.shaikhabdulgani.tmdb.core.domain.repository.UserRepository
 import com.shaikhabdulgani.tmdb.core.domain.util.Resource
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
 import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
 import kotlinx.coroutines.flow.Flow
 
 object DummyHomeRepo : HomeRepository {
-    override suspend fun getTrendingMovies(page: Int): Result<List<Movie>> {
+    override suspend fun getTrendingMovies(page: Int): Result<List<Media>> {
         return Result.failure()
     }
 
-    override suspend fun getUpcomingMovies(page: Int): Result<List<Movie>> {
+    override suspend fun getUpcomingMovies(page: Int): Result<List<Media>> {
         return Result.failure()
     }
 
-    override suspend fun getPopularSeries(page: Int): Result<List<Movie>> {
+    override suspend fun getPopularSeries(page: Int): Result<List<Media>> {
         return Result.failure()
     }
 
-    override suspend fun getOnTheAirSeries(page: Int): Result<List<Movie>> {
+    override suspend fun getOnTheAirSeries(page: Int): Result<List<Media>> {
         return Result.failure()
     }
 }
@@ -58,7 +58,7 @@ object DummyAuthRepo : AuthRepository{
 }
 
 object DummyUserRepo : UserRepository{
-    override suspend fun getUser(forceRemoteFetch: Boolean, uid: String): Result<User> {
+    override suspend fun getUser(uid: String, forceRemoteFetch: Boolean): Result<User> {
         TODO("Not yet implemented")
     }
 

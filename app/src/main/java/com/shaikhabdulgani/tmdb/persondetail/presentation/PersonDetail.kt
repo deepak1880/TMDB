@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.shaikhabdulgani.tmdb.R
-import com.shaikhabdulgani.tmdb.core.presentation.MovieRowWithTitle
+import com.shaikhabdulgani.tmdb.core.presentation.MediaRow
 import com.shaikhabdulgani.tmdb.core.presentation.TextWithStartIcon
 import com.shaikhabdulgani.tmdb.global.Screen
 import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
@@ -41,7 +40,6 @@ import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.Gray
 import com.shaikhabdulgani.tmdb.ui.theme.LightGray
 import com.shaikhabdulgani.tmdb.ui.theme.Transparent
-import com.shaikhabdulgani.tmdb.ui.theme.White50
 import com.shaikhabdulgani.tmdb.ui.theme.spacing
 
 @Composable
@@ -127,7 +125,7 @@ fun PersonDetail(
                 color = LightGray
             )
 
-            MovieRowWithTitle(
+            MediaRow(
                 modifier = Modifier
                     .fillMaxWidth(),
                 title = "Appearance in movies",
@@ -138,7 +136,7 @@ fun PersonDetail(
                     mediaType = MediaType.MOVIE.getValue()
                 ))
             }
-            MovieRowWithTitle(
+            MediaRow(
                 modifier = Modifier
                     .fillMaxWidth(),
                 title = "Appeared in series",

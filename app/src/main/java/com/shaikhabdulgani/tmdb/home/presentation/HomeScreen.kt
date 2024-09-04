@@ -1,6 +1,5 @@
 package com.shaikhabdulgani.tmdb.home.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,14 +33,14 @@ import com.shaikhabdulgani.tmdb.ui.theme.DarkBg
 import com.shaikhabdulgani.tmdb.ui.theme.GradientStart
 import com.shaikhabdulgani.tmdb.ui.theme.TMDBTheme
 import com.shaikhabdulgani.tmdb.ui.theme.Transparent
-import com.shaikhabdulgani.tmdb.core.presentation.MovieRowWithTitle
+import com.shaikhabdulgani.tmdb.core.presentation.MediaRow
 import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyAuthRepo
 import com.shaikhabdulgani.tmdb.core.presentation.dummy.DummyHomeRepo
+import com.shaikhabdulgani.tmdb.core.presentation.util.toContentDetail
 import com.shaikhabdulgani.tmdb.core.presentation.util.noRippleClickable
 import com.shaikhabdulgani.tmdb.home.presentation.components.HomeTopTitle
 import com.shaikhabdulgani.tmdb.home.presentation.components.TabLayout
 import com.shaikhabdulgani.tmdb.home.presentation.util.HomeTab
-import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 import com.shaikhabdulgani.tmdb.ui.theme.SearchBarBg
 import com.shaikhabdulgani.tmdb.ui.theme.Shapes
 import com.shaikhabdulgani.tmdb.ui.theme.White50
@@ -130,71 +129,34 @@ fun HomeScreen(
 
         when (viewModel.currentActiveTab) {
             HomeTab.MOVIES -> {
-                MovieRowWithTitle(
+                MediaRow(
                     title = stringResource(R.string.trending),
                     movies = viewModel.trendingMovies.list,
-                    onClick = {
-                        controller.navigate(
-                            Screen.MovieDetail(
-                                id = it.id,
-                                mediaType = MediaType.MOVIE.getValue()
-                            )
-                        )
-                    },
-                    onLastReached = {
-                        Log.d("onLastReached", "Last Reached")
-                        viewModel.loadTrendingMovies()
-                    }
+                    onClick = controller::toContentDetail,
+                    onLastReached = viewModel::loadTrendingMovies
                 )
 
-                MovieRowWithTitle(
+                MediaRow(
                     title = stringResource(R.string.upcoming),
                     movies = viewModel.upcomingMovies.list,
-                    onClick = {
-                        controller.navigate(
-                            Screen.MovieDetail(
-                                id = it.id,
-                                mediaType = MediaType.MOVIE.getValue()
-                            )
-                        )
-                    },
-                    onLastReached = {
-                        viewModel.loadUpcomingMovies()
-                    }
+                    onClick = controller::toContentDetail,
+                    onLastReached = viewModel::loadUpcomingMovies
                 )
             }
 
             else -> {
-                MovieRowWithTitle(
+                MediaRow(
                     title = stringResource(R.string.trending),
                     movies = viewModel.popularSeries.list,
-                    onClick = {
-                        controller.navigate(
-                            Screen.MovieDetail(
-                                id = it.id,
-                                mediaType = MediaType.SERIES.getValue()
-                            )
-                        )
-                    },
-                    onLastReached = {
-                        viewModel.loadPopularSeries()
-                    }
+                    onClick = controller::toContentDetail,
+                    onLastReached = viewModel::loadPopularSeries
                 )
 
-                MovieRowWithTitle(
+                MediaRow(
                     title = stringResource(R.string.on_the_air),
                     movies = viewModel.onTheAirSeries.list,
-                    onClick = {
-                        controller.navigate(
-                            Screen.MovieDetail(
-                                id = it.id,
-                                mediaType = MediaType.SERIES.getValue()
-                            )
-                        )
-                    },
-                    onLastReached = {
-                        viewModel.loadOnTheAirSeries()
-                    }
+                    onClick = controller::toContentDetail,
+                    onLastReached = viewModel::loadOnTheAirSeries
                 )
             }
         }
