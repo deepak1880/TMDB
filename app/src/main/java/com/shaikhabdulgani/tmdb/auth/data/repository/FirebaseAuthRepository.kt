@@ -29,7 +29,7 @@ class FirebaseAuthRepository @Inject constructor(
                 }
             }
 
-            val user = when(val userResult = userRepository.getUser(true, authResult.result.user!!.uid)){
+            val user = when(val userResult = userRepository.getUser(authResult.result.user!!.uid, true)){
                 is Result.Failure -> {
                     throw Exception(userResult.error)
                 }
@@ -81,7 +81,7 @@ class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun uuid() = auth.currentUser?.uid ?: ""
 
-    override suspend fun getLoggedInUser() = userRepository.getUser(false,uuid() ?: "").data
+    override suspend fun getLoggedInUser() = userRepository.getUser(uuid()).data
 
     override suspend fun logout() = auth.signOut()
 }

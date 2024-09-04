@@ -13,14 +13,13 @@ import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.core.data.util.await
 import com.shaikhabdulgani.tmdb.core.domain.model.User
 import com.shaikhabdulgani.tmdb.core.domain.repository.UserRepository
-import java.io.IOException
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val db: AppDatabase
 ) : UserRepository, BaseRepository() {
-    override suspend fun getUser(forceRemoteFetch: Boolean, uid: String): Result<User> {
+    override suspend fun getUser(uid: String, forceRemoteFetch: Boolean): Result<User> {
         return execute {
             if (!forceRemoteFetch) {
                 val user = db.userDao.getUser(uid)
@@ -96,7 +95,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun isBookmarked(uid: String, movieId: String): Result<Boolean> {
         return execute {
-            val user = getUser(true,uid)
+            val user = getUser(uid,true)
             if(user is Result.Success){
                 user.data?.favorites?.contains(movieId) ?: false
             }else{

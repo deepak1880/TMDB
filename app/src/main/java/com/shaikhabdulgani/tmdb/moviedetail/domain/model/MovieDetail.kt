@@ -1,6 +1,6 @@
 package com.shaikhabdulgani.tmdb.moviedetail.domain.model
 
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
 import com.shaikhabdulgani.tmdb.search.domain.model.ContentType
 
 data class MovieDetail(
@@ -15,6 +15,6 @@ data class MovieDetail(
     val rating: Double,
     val genres: List<Genre>,
     val cast: List<Cast>,
-    val recommendations: List<Movie>
+    val recommendations: List<Media>
 )
 

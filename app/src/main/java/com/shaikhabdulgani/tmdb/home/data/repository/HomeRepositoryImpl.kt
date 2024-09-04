@@ -10,7 +10,7 @@ import com.shaikhabdulgani.tmdb.core.data.util.isOneHourEarlier
 import com.shaikhabdulgani.tmdb.home.data.local.dao.MovieDao
 import com.shaikhabdulgani.tmdb.home.data.local.dao.SeriesDao
 import com.shaikhabdulgani.tmdb.home.data.remote.HomeApi
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
 import com.shaikhabdulgani.tmdb.home.domain.repository.HomeRepository
 import com.shaikhabdulgani.tmdb.home.data.mapper.toEntity
 import com.shaikhabdulgani.tmdb.home.data.mapper.toMovie
@@ -26,28 +26,28 @@ class HomeRepositoryImpl @Inject constructor(
         private const val TAG = "HomeRepositoryImpl"
     }
 
-    override suspend fun getTrendingMovies(page: Int): Result<List<Movie>> {
+    override suspend fun getTrendingMovies(page: Int): Result<List<Media>> {
         return execute {
             val listType = MovieListType.POPULAR.value
             getMovieList(page, listType)
         }
     }
 
-    override suspend fun getUpcomingMovies(page: Int): Result<List<Movie>> {
+    override suspend fun getUpcomingMovies(page: Int): Result<List<Media>> {
         return execute {
             val listType = MovieListType.UPCOMING.value
             getMovieList(page, listType)
         }
     }
 
-    override suspend fun getPopularSeries(page: Int): Result<List<Movie>> {
+    override suspend fun getPopularSeries(page: Int): Result<List<Media>> {
         return execute {
             val listType = SeriesListType.POPULAR.value
             getSeriesList(page, listType)
         }
     }
 
-    override suspend fun getOnTheAirSeries(page: Int): Result<List<Movie>> {
+    override suspend fun getOnTheAirSeries(page: Int): Result<List<Media>> {
         return execute {
             val listType = SeriesListType.ON_THE_AIR.value
             getSeriesList(page, listType)
@@ -58,7 +58,7 @@ class HomeRepositoryImpl @Inject constructor(
         page: Int,
         listType: String,
         forceRemote: Boolean = false
-    ): List<Movie> {
+    ): List<Media> {
         //fetching data from local db
         if (!forceRemote) {
             val localResult = seriesDao.getSeries(
@@ -99,7 +99,7 @@ class HomeRepositoryImpl @Inject constructor(
         page: Int,
         listType: String,
         forceRemote: Boolean = false
-    ): List<Movie> {
+    ): List<Media> {
         //fetching data from local db
         if (!forceRemote) {
             val localResult = movieDao.getMovies(

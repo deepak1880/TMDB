@@ -4,7 +4,7 @@ import com.shaikhabdulgani.tmdb.core.data.util.Result
 import com.shaikhabdulgani.tmdb.core.domain.model.User
 
 interface UserRepository {
-    suspend fun getUser(forceRemoteFetch: Boolean, uid: String): Result<User>
+    suspend fun getUser(uid: String, forceRemoteFetch: Boolean = false): Result<User>
     suspend fun addUser(uid: String, username: String, email: String): Result<User>
     suspend fun bookmarkMovie(uid: String,movieId: String): Result<Boolean>
     suspend fun removeMovieBookmark(uid: String,movieId: String): Result<Boolean>

@@ -35,20 +35,21 @@ import coil.size.Size
 import com.shaikhabdulgani.tmdb.R
 import com.shaikhabdulgani.tmdb.core.presentation.util.shimmer
 import com.shaikhabdulgani.tmdb.global.Constants
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
+import com.shaikhabdulgani.tmdb.home.domain.model.Media
 import com.shaikhabdulgani.tmdb.moviedetail.presentation.SectionWithTitle
+import com.shaikhabdulgani.tmdb.search.domain.model.MediaType
 import com.shaikhabdulgani.tmdb.ui.theme.Gray
 import com.shaikhabdulgani.tmdb.ui.theme.Shapes
 import com.shaikhabdulgani.tmdb.ui.theme.spacing
 
 @Composable
-fun MovieRowWithTitle(
+fun MediaRow(
     modifier: Modifier = Modifier,
     title: String,
-    movies: List<Movie>,
+    movies: List<Media>,
     isLoading: Boolean = true,
     onLastReached: () -> Unit = {},
-    onClick: (Movie) -> Unit
+    onClick: (Media) -> Unit
 ) {
     SectionWithTitle(
         modifier = modifier,
@@ -101,8 +102,8 @@ fun MovieRowWithTitle(
 private fun MovieItem(
     modifier: Modifier = Modifier,
     position: Int,
-    item: Movie,
-    onClick: (Movie) -> Unit,
+    item: Media,
+    onClick: (Media) -> Unit,
 ) {
     val context = LocalContext.current
     val image = rememberAsyncImagePainter(
@@ -216,7 +217,7 @@ private fun EmptyListPrev() {
 @Composable
 private fun MovieItemPrev() {
     val context = LocalContext.current
-    MovieItem(position = 0, item = Movie(0, "Hello", "")) {
+    MovieItem(position = 0, item = Media(0, "Hello", "",MediaType.MOVIE)) {
 
     }
 }

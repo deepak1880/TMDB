@@ -2,7 +2,6 @@ package com.shaikhabdulgani.tmdb.home.data.remote.model
 
 
 import com.google.gson.annotations.SerializedName
-import com.shaikhabdulgani.tmdb.home.domain.model.Movie
 
 data class SeriesDto(
     @SerializedName("adult")
